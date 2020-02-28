@@ -1,0 +1,38 @@
+Project Idea: Conditional Heat Maps
+
+We would like to generate heat maps that change depending on fine-grained context features.  A heatmap is a nice way to visualize how "hot" a batter is depending on the location of the pitched ball.  What heatmaps fail to visualize is how hot a batter is depending on other relevant context, such as the handedness of the pitcher, the pitch type, the current count, the umpire, etc.  Unfortunately, the more features we consider to make up our "context", the less data we have for that context, so making heatmaps with traditional methods would not work due to data scarcity.  Our idea to overcome this is to treat it as a prediction problem, which we solve with machine learning.  In particular, our goal is to predict the "heat" of a batter given all the features of a context, including the (x,y) location of the pitch.  Our features will include all relevant context available in the statcast dataset, and our target will be some measure of heat, to be decided later.  
+
+Goals:
+
+The analyst should be able to specify how they want to measure heat, some available options include:
+    Probability of hit
+    Batting average
+    Slugging average
+    launch angle/speed
+
+The analyst should also be able to specify any subset of the relevant context features, including:
+
+Things known prior to pitch being thrown:
+    batter
+        batter handedness
+    pitcher
+        pitcher handedness
+    umpire
+    ballpark
+    current count
+    men on base
+        on 1B
+        on 2B
+        on 3B
+    # of outs
+    current score
+    inning
+    home game
+    time or day/night
+
+Properties of the pitch:
+    pitch type
+    pitch speed
+    pitch spin rate
+
+The visualization should show a continuous heat map for that context, which can be computed on the fly by making calls to a pre-trained machine learning learning model.  
