@@ -1,11 +1,31 @@
 # baseball-hackday
 
+## Setting up a development environment
+
+### Using a virtual environment
+
+Because the web server relies on many third party packages, using a [virtual environment](https://docs.python.org/3/tutorial/venv.html) can help ensure that compatible versions of those packages are installed and do not conflict with other versions of packages that may be installed on the same machine. This is not required, but may help avoid bugs caused by a tangled dependecy tree.
+
+A virtual environment can be created with the command `python3 -m venv <name>` where `<name>` is the name you give to your virtual environment. This creates a directory called `<name>` (be sure to add it to `.gitignore`). Before it can be used, the virtual environment must be activated using the following command:
+
+Windows
+
+```
+name\Scripts\activate.bat
+```
+
+Mac/Unix
+
+```
+. name/bin/activate
+```
+
+#### Installing new packages
+
+After the virtual environment has been setup `pip install` will install packages in the virtual environment. A list of package dependencies is kept in `requirements.txt` (checked into git). After installing a new package, update `requirements.txt` by running the script `bin/freeze.sh`.
+
+If you're setting up the repository for the first time, install the packages listed in `requirements.txt` by running the script `bin/install.sh`.
+
 ## Rendering the visualization
 
-The json data and javascript source code are compiled into a single artifact and injected into an html document during a webpack build process. Thus, the following steps are required to view the visualization of the data:
-
-1. Install the latest version of Node.js from https://nodejs.org/en/download/
-2. From the `visualization/` directory, run `npm install` to download the project dependencies (build tools & d3.js).
-3. Run the build process with `npm run build`
-4. Open `visualization/dist/index.html` in a web browser.
-5. Alternatively, run `npm run dev` to build and serve the visualization in development mode. This allows changes to the source code to trigger a rebuild and be hot reloaded into the browser. View the visualization at http://localhost:8080.
+The model is exposed through a simple webpage that allows the input of parameters to generate a heatmap. This webpage is served from a server implemented using the [Flask framework for Python](https://flask.palletsprojects.com/en/1.1.x/). To start the server, run the bash script at `bin/run-server.sh` and navigate to http://localhost:5000 to view the webpage.
