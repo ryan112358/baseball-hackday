@@ -16,7 +16,10 @@
       </button>
     </form>
     <div id="visualization">
-      <svg></svg>
+      <svg>
+        <g id="heatmap"></g>
+        <g id="strikezone"></g>
+      </svg>
     </div>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="{{ url_for('static', filename='heatmap.js') }}"></script>

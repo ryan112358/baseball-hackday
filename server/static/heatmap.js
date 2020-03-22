@@ -1,3 +1,4 @@
+/* Page initialization logic */
 const heatmapSubmitButton = document.getElementById("heatmap-form-submit");
 
 heatmapSubmitButton.onclick = function() {
@@ -34,12 +35,13 @@ function drawHeatmap(heatmap) {
   // TODO: reliably calculate these dimensions from the data
   const pointWidth = boundingBoxWidth / 50;
   const pointHeight = boundingBoxHeight / 50;
-  // Calculate the dimensions of the strike zone
-  const strikeZoneWidth = heatmap.zone[2] - heatmap.zone[0];
-  const strikeZoneHeight = heatmap.zone[3] - heatmap.zone[1];
-  // Calculate the placement of the strike zone within the bounding box
-  const strikeZoneXOffset = heatmap.zone[0] - boundingBox[0].x;
-  const strikeZoneYOffset = boundingBox[1].y - heatmap.zone[3];
+  // Calculate the dimensions and placement of the strike zone
+  const strikeZone = {
+    width: heatmap.zone[2] - heatmap.zone[0],
+    height: heatmap.zone[3] - heatmap.zone[1],
+    xOffset: heatmap.zone[0] - boundingBox[0].x,
+    yOffset: boundingBox[1].y - heatmap.zone[3]
+  };
 
   // The svg coordinate system places (0,0) in the top-left corner
   // While our coordinate system places (0,0) in the center of the bottom
@@ -66,25 +68,29 @@ function drawHeatmap(heatmap) {
   svg
     .attr("width", boundingBoxWidth * scale)
     .attr("height", boundingBoxHeight * scale)
+    .select("g#heatmap")
     .selectAll("rect")
     .data(data)
     .join("rect")
     .attr("x", d => d.x)
     .attr("y", d => d.y)
-    .attr("width", Math.ceil(pointWidth * scale))
-    .attr("height", Math.ceil(pointHeight * scale))
+    .attr("width", pointWidth * scale)
+    .attr("height", pointHeight * scale)
     .attr("fill", d => getColor(d.heat))
     .attr("stroke", d => getColor(d.heat));
 
   // Render the strike zone
   svg
-    .append("rect")
-    .style("stroke", "black")
-    .style("fill", "none")
-    .attr("x", strikeZoneXOffset * scale)
-    .attr("y", strikeZoneYOffset * scale)
-    .attr("width", strikeZoneWidth * scale)
-    .attr("height", strikeZoneHeight * scale);
+    .select("g#strikezone")
+    .selectAll("rect")
+    .data([strikeZone])
+    .join("rect")
+    .attr("x", strikeZone => strikeZone.xOffset * scale)
+    .attr("y", strikeZone => strikeZone.yOffset * scale)
+    .attr("width", strikeZone => strikeZone.width * scale)
+    .attr("height", strikeZone => strikeZone.height * scale)
+    .attr("stroke", "black")
+    .attr("fill", "none");
 }
 
 /**
