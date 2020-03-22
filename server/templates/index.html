@@ -9,8 +9,16 @@
     />
   </head>
   <body>
-    <div id="root"></div>
+    <header></header>
+    <form action="{{ url_for('heatmap') }}" method="POST">
+      <button id="heatmap-form-submit" type="button">
+        Generate Heatmap
+      </button>
+    </form>
+    <div id="visualization">
+      <svg></svg>
+    </div>
     <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="{{ url_for('static', filename='drawHeatmap.js') }}"></script>
+    <script src="{{ url_for('static', filename='heatmap.js') }}"></script>
   </body>
 </html>

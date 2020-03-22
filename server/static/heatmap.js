@@ -1,33 +1,10 @@
-/**
- * Produce a color for the given heat value for display. See
- * https://github.com/d3/d3-scale-chromatic/tree/v1.5.0#interpolateRdYlGn
- * @param {number} heat A number between 0 and 1
- */
-function getColor(heat) {
-  return d3.interpolateRdYlBu(1 - heat);
-}
+const heatmapSubmitButton = document.getElementById("heatmap-form-submit");
 
-/**
- * Transform raw coordinates to match the scale and dimensions of the render area.
- * @param {number} x The x coordinate of a point.
- * @param {number} y The y coordinate of a point.
- */
-function transformCoordinates(x, y) {
-  // The svg coordinate system places (0,0) in the top-left corner
-  // While our coordinate system places (0,0) in the center of the bottom
-  const boundingBoxOrigin = {
-    x: boundingBoxWidth / 2,
-    y: boundingBoxHeight
-  };
-  const remappedX = x + boundingBoxOrigin.x;
-  // The svg coordinate system has the positive y-axis extending down
-  const remappedY = boundingBoxOrigin.y - y;
-  // Finally, scale
-  return {
-    x: remappedX * scale,
-    y: remappedY * scale
-  };
-}
+heatmapSubmitButton.onclick = function() {
+  return generateHeatmap().then(heatmap => drawHeatmap(heatmap));
+};
+
+/* Drawing/rendering logic */
 
 /**
  * An object describing a heatmap. Zone provides the coordinates of the strike zone
@@ -64,19 +41,29 @@ function drawHeatmap(heatmap) {
   const strikeZoneXOffset = heatmap.zone[0] - boundingBox[0].x;
   const strikeZoneYOffset = boundingBox[1].y - heatmap.zone[3];
 
+  // The svg coordinate system places (0,0) in the top-left corner
+  // While our coordinate system places (0,0) in the center of the bottom
+  const boundingBoxOrigin = {
+    x: boundingBoxWidth / 2,
+    y: boundingBoxHeight
+  };
+
   // Process the raw heatmap data
   const data = [];
   for (let index = 0; index < heatmap.x.length; index++) {
     const x = heatmap.x[index];
     const y = heatmap.y[index];
     const heat = heatmap.heat[index];
-    data.push({ ...transformCoordinates(x, y), heat });
+    data.push({
+      ...transformCoordinates(x, y, boundingBoxOrigin, scale),
+      heat
+    });
   }
 
   // Render the heat points
-  d3.select("#root")
-    .append("svg")
-    .attr("id", "boundingBox")
+  const svg = d3.select("#visualization").select("svg");
+
+  svg
     .attr("width", boundingBoxWidth * scale)
     .attr("height", boundingBoxHeight * scale)
     .selectAll("rect")
@@ -90,7 +77,7 @@ function drawHeatmap(heatmap) {
     .attr("stroke", d => getColor(d.heat));
 
   // Render the strike zone
-  d3.select("#boundingBox")
+  svg
     .append("rect")
     .style("stroke", "black")
     .style("fill", "none")
@@ -98,4 +85,43 @@ function drawHeatmap(heatmap) {
     .attr("y", strikeZoneYOffset * scale)
     .attr("width", strikeZoneWidth * scale)
     .attr("height", strikeZoneHeight * scale);
+}
+
+/**
+ * Produce a color for the given heat value for display. See
+ * https://github.com/d3/d3-scale-chromatic/tree/v1.5.0#interpolateRdYlGn
+ * @param {number} heat A number between 0 and 1
+ */
+function getColor(heat) {
+  return d3.interpolateRdYlBu(1 - heat);
+}
+
+/**
+ * Transform raw coordinates to match the scale and dimensions of the render area.
+ * @param {number} x The x coordinate of a point.
+ * @param {number} y The y coordinate of a point.
+ * @param {{ x: number, y: number }} origin The origin of the new coordinate system.
+ * @param {number} scale The scale factor of the new coordinate system.
+ */
+function transformCoordinates(x, y, origin, scale) {
+  const remappedX = x + origin.x;
+  // The svg coordinate system has the positive y-axis extending down
+  const remappedY = origin.y - y;
+  // Finally, scale
+  return {
+    x: remappedX * scale,
+    y: remappedY * scale
+  };
+}
+
+/* API Calls */
+
+/**
+ * Send an http request to the server to generate a heatmap.
+ * @returns {Promise<Heatmap>}
+ */
+function generateHeatmap() {
+  return fetch("/heatmap", { method: "POST" }).then(response => {
+    return response.json();
+  });
 }
