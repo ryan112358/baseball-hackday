@@ -1,5 +1,12 @@
 # system files
 **/*.DS_Store
+__pycache__
+
+# python virtual environment
+venv
+
+# ide configuration
+.vscode
 
 # third party libraries
 node_modules
