@@ -1,19 +1,25 @@
 /* Page initialization logic */
-const heatmapSubmitButton = document.getElementById("heatmap-form-submit");
+window.addEventListener("load", function() {
+  const heatmapForm = document.getElementById("heatmap-form");
 
-heatmapSubmitButton.onclick = function() {
-  hideError();
-  toggleLoading(true);
-  return generateHeatmap()
-    .then(heatmap => {
-      toggleLoading(false);
-      drawHeatmap(heatmap);
-    })
-    .catch(error => {
-      toggleLoading(false);
-      showError(error.message);
-    });
-};
+  heatmapForm.addEventListener("submit", function(event) {
+    // Prevent full page form submission and just send the api call
+    event.preventDefault();
+    hideError();
+    toggleLoading(true);
+    // Get the input from the form
+    const formData = new FormData(heatmapForm);
+    return generateHeatmap(formData)
+      .then(heatmap => {
+        toggleLoading(false);
+        drawHeatmap(heatmap);
+      })
+      .catch(error => {
+        toggleLoading(false);
+        showError(error.message);
+      });
+  });
+});
 
 /* Drawing/rendering logic */
 function toggleLoading(isLoading) {
@@ -154,13 +160,15 @@ function transformCoordinates(x, y, origin, scale) {
  * Send an http request to the server to generate a heatmap.
  * @returns {Promise<Heatmap>}
  */
-function generateHeatmap() {
-  return fetch("/heatmap", { method: "POST" }).then(response => {
-    if (response.ok) {
-      return response.json();
+function generateHeatmap(formData) {
+  return fetch("/heatmap", { method: "POST", body: formData }).then(
+    response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(
+        `Api responded with status code: ${response.status} error: ${response.statusText}`
+      );
     }
-    throw new Error(
-      `Api responded with status code: ${response.status} error: ${response.statusText}`
-    );
-  });
+  );
 }

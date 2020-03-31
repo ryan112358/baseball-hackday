@@ -10,8 +10,12 @@
   </head>
   <body>
     <header></header>
-    <form action="{{ url_for('heatmap') }}" method="POST">
-      <button id="heatmap-form-submit" type="button">
+    <form id="heatmap-form">
+      <label for="batter">
+        Batter ID
+        <input type="text" id="batter" name="batter" />
+      </label>
+      <button type="submit">
         Generate Heatmap
       </button>
       <p id="error-message" class="hidden"></p>
