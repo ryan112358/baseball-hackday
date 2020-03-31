@@ -2,10 +2,38 @@
 const heatmapSubmitButton = document.getElementById("heatmap-form-submit");
 
 heatmapSubmitButton.onclick = function() {
-  return generateHeatmap().then(heatmap => drawHeatmap(heatmap));
+  hideError();
+  toggleLoading(true);
+  return generateHeatmap()
+    .then(heatmap => {
+      toggleLoading(false);
+      drawHeatmap(heatmap);
+    })
+    .catch(error => {
+      toggleLoading(false);
+      showError(error.message);
+    });
 };
 
 /* Drawing/rendering logic */
+function toggleLoading(isLoading) {
+  const loadingIndicator = d3.select("#loading-indicator");
+  loadingIndicator.classed("hidden", !isLoading);
+}
+
+function showError(message) {
+  const errorNode = d3.select("#error-message");
+
+  if (errorNode.classed("hidden")) {
+    errorNode.classed("hidden", false);
+  }
+
+  errorNode.innerHTML = message;
+}
+
+function hideError() {
+  d3.select("#error-message").classed("hidden", true);
+}
 
 /**
  * An object describing a heatmap. Zone provides the coordinates of the strike zone
@@ -128,6 +156,11 @@ function transformCoordinates(x, y, origin, scale) {
  */
 function generateHeatmap() {
   return fetch("/heatmap", { method: "POST" }).then(response => {
-    return response.json();
+    if (response.ok) {
+      return response.json();
+    }
+    throw new Error(
+      `Api responded with status code: ${response.status} error: ${response.statusText}`
+    );
   });
 }
