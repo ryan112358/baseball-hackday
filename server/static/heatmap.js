@@ -1,11 +1,45 @@
 /* Page initialization logic */
-const heatmapSubmitButton = document.getElementById("heatmap-form-submit");
+window.addEventListener("load", function() {
+  const heatmapForm = document.getElementById("heatmap-form");
 
-heatmapSubmitButton.onclick = function() {
-  return generateHeatmap().then(heatmap => drawHeatmap(heatmap));
-};
+  heatmapForm.addEventListener("submit", function(event) {
+    // Prevent full page form submission and just send the api call
+    event.preventDefault();
+    hideError();
+    toggleLoading(true);
+    // Get the input from the form
+    const formData = new FormData(heatmapForm);
+    return generateHeatmap(formData)
+      .then(heatmap => {
+        toggleLoading(false);
+        drawHeatmap(heatmap);
+      })
+      .catch(error => {
+        toggleLoading(false);
+        showError(error.message);
+      });
+  });
+});
 
 /* Drawing/rendering logic */
+function toggleLoading(isLoading) {
+  const loadingIndicator = d3.select("#loading-indicator");
+  loadingIndicator.classed("hidden", !isLoading);
+}
+
+function showError(message) {
+  const errorNode = d3.select("#error-message");
+
+  if (errorNode.classed("hidden")) {
+    errorNode.classed("hidden", false);
+  }
+
+  errorNode.innerHTML = message;
+}
+
+function hideError() {
+  d3.select("#error-message").classed("hidden", true);
+}
 
 /**
  * An object describing a heatmap. Zone provides the coordinates of the strike zone
@@ -99,7 +133,8 @@ function drawHeatmap(heatmap) {
  * @param {number} heat A number between 0 and 1
  */
 function getColor(heat) {
-  return d3.interpolateRdYlBu(1 - heat);
+  const colorScale = d3.scaleSequential(d3.interpolateRdYlBu).domain([0, 0.5]);
+  return colorScale(0.5 - heat);
 }
 
 /**
@@ -126,8 +161,15 @@ function transformCoordinates(x, y, origin, scale) {
  * Send an http request to the server to generate a heatmap.
  * @returns {Promise<Heatmap>}
  */
-function generateHeatmap() {
-  return fetch("/heatmap", { method: "POST" }).then(response => {
-    return response.json();
-  });
+function generateHeatmap(formData) {
+  return fetch("/heatmap", { method: "POST", body: formData }).then(
+    response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(
+        `Api responded with status code: ${response.status} error: ${response.statusText}`
+      );
+    }
+  );
 }

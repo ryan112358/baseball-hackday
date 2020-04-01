@@ -10,10 +10,15 @@
   </head>
   <body>
     <header></header>
-    <form action="{{ url_for('heatmap') }}" method="POST">
-      <button id="heatmap-form-submit" type="button">
+    <form id="heatmap-form">
+      <label for="batter">
+        Batter ID
+        <input type="text" id="batter" name="batter" />
+      </label>
+      <button type="submit">
         Generate Heatmap
       </button>
+      <p id="error-message" class="hidden"></p>
     </form>
     <div id="visualization">
       <svg>
@@ -21,6 +26,7 @@
         <g id="strikezone"></g>
       </svg>
     </div>
+    <div id="loading-indicator" class="hidden"></div>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="{{ url_for('static', filename='heatmap.js') }}"></script>
   </body>

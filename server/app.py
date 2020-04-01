@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import pickle
 import pandas as pd
 import numpy as np
@@ -11,8 +11,7 @@ def index():
 
 @app.route('/heatmap', methods=["POST"])
 def heatmap():
-    # Ryan, this is where you would plug in your function to generate the heatmap
-    features = { 'batter' : 545361 }
+    features = { 'batter' : int(request.form['batter']) }
     return generate_heatmap(features)
 
 def generate_heatmap(features):

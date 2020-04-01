@@ -20,6 +20,8 @@ Mac/Unix
 . name/bin/activate
 ```
 
+Once activated, the environment can be deactivated with the shell command `deactivate`.
+
 #### Installing new packages
 
 After the virtual environment has been setup `pip install` will install packages in the virtual environment. A list of package dependencies is kept in `requirements.txt` (checked into git). After installing a new package, update `requirements.txt` by running the script `bin/freeze.sh`.
