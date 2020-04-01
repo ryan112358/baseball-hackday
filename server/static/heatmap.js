@@ -133,7 +133,8 @@ function drawHeatmap(heatmap) {
  * @param {number} heat A number between 0 and 1
  */
 function getColor(heat) {
-  return d3.interpolateRdYlBu(1 - heat);
+  const colorScale = d3.scaleSequential(d3.interpolateRdYlBu).domain([0, 0.5]);
+  return colorScale(0.5 - heat);
 }
 
 /**
