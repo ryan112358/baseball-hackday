@@ -11,7 +11,7 @@ def index():
 
 @app.route('/heatmap', methods=["POST"])
 def heatmap():
-    features = { 'batter' : request.form['batter'] }
+    features = { 'batter' : int(request.form['batter']) }
     return generate_heatmap(features)
 
 def generate_heatmap(features):
