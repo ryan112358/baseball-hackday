@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import pickle
 import pandas as pd
 import numpy as np
+from scipy import sparse
 
 app = Flask(__name__)
 
@@ -11,7 +12,15 @@ def index():
 
 @app.route('/heatmap', methods=["POST"])
 def heatmap():
-    features = { 'batter' : int(request.form['batter']) }
+    features = { }
+    for f in ['pitch_type','batter','pitcher','stand','p_throws','balls','strikes','in_scoring_pos','on_base','home']:
+        try:
+            features[f] = request.form[f]
+        except:
+            features[f] = '' 
+
+    print(features)
+
     return generate_heatmap(features)
 
 def generate_heatmap(features):
@@ -22,7 +31,10 @@ def generate_heatmap(features):
 
     :return: the heatmap json object
     """
-    model = pickle.load(open('../lgbm.pkl','rb'))
+
+    #model = pickle.load(open('../lgbm.pkl','rb'))
+    model = pickle.load(open('../nnet.pkl','rb'))
+    dtypes = pickle.load(open('../dtypes.pkl','rb'))
     x = pd.DataFrame(np.linspace(-2, 2), columns=['plate_x'])
     y = pd.DataFrame(np.linspace(0, 5), columns=['plate_z'])
     x['key'] = 0
@@ -30,10 +42,17 @@ def generate_heatmap(features):
     df = pd.merge(x, y, on='key').drop(columns='key')
     for col in features:
         df[col] = features[col]
-        if type(features[col]) in [str, int, bool]:
-            df[col] = df[col].astype('category')
+        df[col] = df[col]
 
-    p = model.predict_proba(df)[:,1]
+    features = ['pitch_type', 'batter', 'pitcher', 'stand', 'p_throws', 'balls', 'strikes', 'in_scoring_pos', 'on_base', 'home', 'plate_x', 'plate_z']
+    X = df.astype(dtypes)[features]
+    X1 = X[['plate_x','plate_z']].values
+    X2 = pd.get_dummies(X.drop(columns=['plate_x','plate_z']), dummy_na=True, sparse=True)
+    XX = sparse.hstack([X1, X2], format='csr')
+    #print(XX.shape)
+
+    #p = model.predict_proba(df)[:,1]
+    p = model.predict_proba(XX)[:,1]
 
     json = {}
     json['zone'] = [-0.75, 1.5, 0.75, 3.5]
@@ -42,3 +61,8 @@ def generate_heatmap(features):
     json['heat'] = list(p)
     return json
 
+if __name__ == '__main__':
+    features = ['pitch_type', 'batter', 'pitcher', 'stand', 'p_throws', 'balls', 'strikes', 'in_scoring_pos', 'on_base', 'home']
+    entry = { f : '' for f in features }
+    entry['batter'] = '605141'
+    #ans = generate_heatmap(entry)
