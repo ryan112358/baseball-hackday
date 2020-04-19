@@ -20,3 +20,4 @@ indent_size = 4
 
 # Rules for Python files
 [*.py]
+indent_size = 4
