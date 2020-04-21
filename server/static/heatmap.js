@@ -9,6 +9,28 @@ window.addEventListener("load", function() {
     toggleLoading(true);
     // Get the input from the form
     const formData = new FormData(heatmapForm);
+    // Set default values
+    // Checkboxes do not submit a value when not checked
+    if (!formData.get('in_scoring_pos')) {
+      formData.set('in_scoring_pos', 'False');
+    }
+    if (!formData.get('on_base')) {
+      formData.set('on_base', 'False');
+    }
+
+    // Delete pitch type if default option is selected
+    if (formData.get('pitch_type') === 'null') {
+      formData.delete('pitch_type');
+    }
+
+    // Coerce location radio button into boolean
+    if (formData.get('location') === 'home') {
+      formData.set('home', 'True');
+    } else {
+      formData.set('home', 'False');
+    }
+    formData.delete('location');
+    
     return generateHeatmap(formData)
       .then(heatmap => {
         toggleLoading(false);
@@ -97,7 +119,7 @@ function drawHeatmap(heatmap) {
   }
 
   // Render the heat points
-  const svg = d3.select("#visualization").select("svg");
+  const svg = d3.select("svg#visualization");
 
   svg
     .attr("width", boundingBoxWidth * scale)

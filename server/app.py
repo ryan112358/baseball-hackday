@@ -3,12 +3,15 @@ import pickle
 import pandas as pd
 import numpy as np
 from scipy import sparse
+import json
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    with open('../domain.json', 'r') as domain_file:
+        domain = json.load(domain_file)
+        return render_template('index.html', domain = domain)
 
 @app.route('/heatmap', methods=["POST"])
 def heatmap():
