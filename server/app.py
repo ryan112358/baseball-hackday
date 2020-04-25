@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+from flask_cachebuster import CacheBuster
 import pickle
 import pandas as pd
 import numpy as np
@@ -6,6 +7,13 @@ from scipy import sparse
 import json
 
 app = Flask(__name__)
+
+# Generate a unique hash for static files based on their content. This hash
+# will be sent as a query parameter on requests for the file, ensuring that
+# the browser always gets the most up to date version
+cache_bust_config = { 'extensions': ['.js', '.css'], 'hash_size': 5 }
+cache_buster = CacheBuster(config=cache_bust_config)
+cache_buster.init_app(app)
 
 @app.route('/')
 def index():
