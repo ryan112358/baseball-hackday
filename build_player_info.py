@@ -20,13 +20,9 @@ def addPlayer( id, name, position, team, team_short, bats, throws ):
         batters.append(player)
 
 def savePlayers():
-    with open('data/batters.json', 'w') as batter_file:
-        contents = { 'batters': batters }
+    with open('data/players.json', 'w') as batter_file:
+        contents = { 'batters': batters, 'pitchers': pitchers }
         json.dump(contents, batter_file, indent=4)
-
-    with open('data/pitchers.json', 'w') as pitcher_file:
-        contents = { 'pitchers': pitchers }
-        json.dump(contents, pitcher_file, indent=4)
 
 def getPlayerInfo():
     with open('id_name_map.csv', 'r') as player_info:

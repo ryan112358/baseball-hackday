@@ -1,109 +1,122 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Conditional Heatmap Generation</title>
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
-  </head>
-  <body>
-    <header></header>
-    <div class="main-container">
-      <div class="form-container">
-        <form id="heatmap-form">
-          <div class="input-container batter">
-            <label class="label" for="batter">Batter ID</label>
-            <input type="text" id="batter" name="batter" />
-          </div>
-          <div class="input-container stance">
-            <p class="label">Batter Stance</p>
-            <label class="radio-label stance" for="stand_r">
-              Right
-              <input type="radio" name="stand" id="stand_r" value="R" checked />
-            </label>
-            <label class="radio-label stance" for="stand_l">
-              Left
-              <input type="radio" name="stand" id="stand_l" value="L" />
-            </label>
-          </div>          
-          <div class="input-container pitcher">
-            <label class="label" for="pitcher">Pitcher ID</label>
-            <input type="text" id="pitcher" name="pitcher" />
-          </div>
-          <div class="input-container throws">
-            <p class="label">Pitcher Throws</p>
-            <label class="radio-label throws" for="p_throws_r">
-              Right
-              <input type="radio" name="p_throws" id="p_throws_r" value="R" checked />
-            </label>
-            <label class="radio-label throws" for="p_throws_l">
-              Left
-              <input type="radio" name="p_throws" id="p_throws_l" value="L" />
-            </label>
-          </div>
-          <div class="input-container pitch-type">
-            <label class="label" for="pitch_type">Pitch Type</label>
-            <select id="pitch_type" name="pitch_type">
-              <option value="null" selected>All pitch types</option>
-              {% for pitch_type in domain.pitch_type %}
-              <option>{{ pitch_type }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="input-container count">
-            <p class="label">Count</p>
-            <label for="balls">Balls</label>
-            <select id="balls" name="balls">
-              {% for ball_count in domain.balls %}
-              <option>{{ ball_count }}</option>
-              {% endfor %}
-            </select>
-            <label for="strikes">Strikes</label>
-            <select id="strikes" name="strikes">
-              {% for strike_count in domain.strikes %}
-              <option>{{ strike_count }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="input-container situation">
-            <p class="label">Situation</p>
-            <label class="checkbox-label" for="in_scoring_pos">
-              In Scoring Position
-              <input type="checkbox" id="in_scoring_pos" name="in_scoring_pos" value="True" />
-            </label>
-            <label class="checkbox-label" for="on_base">
-              On Base
-              <input type="checkbox" id="on_base" name="on_base" value="True" />
-            </label>
-          </div>
-          <div class="input-container location">
-            <p class="label">Location</p>
-            <label class="radio-label" for="location_home">
-              Home
-              <input type="radio" name="location" id="location_home" value="home" checked />
-            </label>
-            <label class="radio-label" for="location_away">
-              Away
-              <input type="radio" name="location" id="location_away" value="away" />
-            </label>
-          </div>
-          <button class="submit-button" type="submit">
-            Generate Heatmap
-          </button>
-          <p id="error-message" class="hidden"></p>
-        </form>
-      </div>
-      <div class="viz-container">
-        <svg id="visualization">
-          <g id="heatmap"></g>
-          <g id="strikezone"></g>
-        </svg>
-      </div>
+
+<head>
+  <title>Conditional Heatmap Generation</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+
+<body>
+  <header></header>
+  <div class="main-container">
+    <div class="form-container">
+      <form id="heatmap-form">
+        <div class="input-container batter">
+          <label class="label" for="batter">Batter</label>
+          <input type="text" id="batter" name="batter" list="batters_list" />
+          <datalist id="batters_list">
+            {% for batter in batters %}
+            <option data-value="{{ batter.id }}" label="{{ batter.position + ', ' + batter.team_short }}">
+              {{ batter.name }}
+            </option>
+            {% endfor %}
+          </datalist>
+        </div>
+        <div class="input-container stance">
+          <p class="label">Batter Stance</p>
+          <label class="radio-label stance" for="stand_r">
+            Right
+            <input type="radio" name="stand" id="stand_r" value="R" checked />
+          </label>
+          <label class="radio-label stance" for="stand_l">
+            Left
+            <input type="radio" name="stand" id="stand_l" value="L" />
+          </label>
+        </div>
+        <div class="input-container pitcher">
+          <label class="label" for="pitcher">Pitcher</label>
+          <input type="text" id="pitcher" name="pitcher" list="pitchers_list" />
+          <datalist id="pitchers_list">
+            {% for pitcher in pitchers %}
+            <option data-value="{{ pitcher.id }}" label="{{ pitcher.team_short }}">
+              {{ pitcher.name }}
+            </option>
+            {% endfor %}
+          </datalist>
+        </div>
+        <div class="input-container throws">
+          <p class="label">Pitcher Throws</p>
+          <label class="radio-label throws" for="p_throws_r">
+            Right
+            <input type="radio" name="p_throws" id="p_throws_r" value="R" checked />
+          </label>
+          <label class="radio-label throws" for="p_throws_l">
+            Left
+            <input type="radio" name="p_throws" id="p_throws_l" value="L" />
+          </label>
+        </div>
+        <div class="input-container pitch-type">
+          <label class="label" for="pitch_type">Pitch Type</label>
+          <select id="pitch_type" name="pitch_type">
+            <option value="null" selected>All pitch types</option>
+            {% for pitch_type in domain.pitch_type %}
+            <option>{{ pitch_type }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="input-container count">
+          <p class="label">Count</p>
+          <label for="balls">Balls</label>
+          <select id="balls" name="balls">
+            {% for ball_count in domain.balls %}
+            <option>{{ ball_count }}</option>
+            {% endfor %}
+          </select>
+          <label for="strikes">Strikes</label>
+          <select id="strikes" name="strikes">
+            {% for strike_count in domain.strikes %}
+            <option>{{ strike_count }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="input-container situation">
+          <p class="label">Situation</p>
+          <label class="checkbox-label" for="in_scoring_pos">
+            In Scoring Position
+            <input type="checkbox" id="in_scoring_pos" name="in_scoring_pos" value="True" />
+          </label>
+          <label class="checkbox-label" for="on_base">
+            On Base
+            <input type="checkbox" id="on_base" name="on_base" value="True" />
+          </label>
+        </div>
+        <div class="input-container location">
+          <p class="label">Location</p>
+          <label class="radio-label" for="location_home">
+            Home
+            <input type="radio" name="location" id="location_home" value="home" checked />
+          </label>
+          <label class="radio-label" for="location_away">
+            Away
+            <input type="radio" name="location" id="location_away" value="away" />
+          </label>
+        </div>
+        <button class="submit-button" type="submit">
+          Generate Heatmap
+        </button>
+        <p id="error-message" class="hidden"></p>
+      </form>
     </div>
-    <div id="loading-indicator" class="hidden"></div>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="{{ url_for('static', filename='heatmap.js') }}"></script>
-  </body>
+    <div class="viz-container">
+      <svg id="visualization">
+        <g id="heatmap"></g>
+        <g id="strikezone"></g>
+      </svg>
+    </div>
+  </div>
+  <div id="loading-indicator" class="hidden"></div>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="{{ url_for('static', filename='heatmap.js') }}"></script>
+</body>
+
 </html>
