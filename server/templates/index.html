@@ -15,11 +15,6 @@
           <label class="label" for="batter">Batter</label>
           <input type="text" id="batter" name="batter" list="batters_list" />
           <datalist id="batters_list">
-            {% for batter in batters %}
-            <option data-value="{{ batter.id }}" label="{{ batter.position + ', ' + batter.team_short }}">
-              {{ batter.name }}
-            </option>
-            {% endfor %}
           </datalist>
         </div>
         <div class="input-container stance">
@@ -37,11 +32,6 @@
           <label class="label" for="pitcher">Pitcher</label>
           <input type="text" id="pitcher" name="pitcher" list="pitchers_list" />
           <datalist id="pitchers_list">
-            {% for pitcher in pitchers %}
-            <option data-value="{{ pitcher.id }}" label="{{ pitcher.team_short }}">
-              {{ pitcher.name }}
-            </option>
-            {% endfor %}
           </datalist>
         </div>
         <div class="input-container throws">

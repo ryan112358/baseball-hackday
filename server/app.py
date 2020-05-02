@@ -20,16 +20,10 @@ cache_buster.init_app(app)
 @app.route('/')
 def index():
     domain = {}
-    players = {}
-
     with open('../data/domain.json', 'r') as domain_file:
         domain = json.load(domain_file)
-
-    with open('../data/players.json', 'r') as players_file:
-        players = json.load(players_file)
     
-    return render_template('index.html', domain = domain, batters = players['batters'],
-        pitchers = players['pitchers'])
+    return render_template('index.html', domain = domain)
 
 @app.route('/heatmap', methods=['POST'])
 def heatmap():

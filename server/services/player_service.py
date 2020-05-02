@@ -25,4 +25,4 @@ def getPitchers(name_prefix = None):
     return pitchers
 
 def findByNamePrefix(players, name_prefix):
-    return filter(lambda player: name_prefix.lower() in player.name.lower(), players)
+    return [player for player in players if name_prefix.lower() in player['name'].lower()]

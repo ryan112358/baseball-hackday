@@ -41,6 +41,14 @@ window.addEventListener("load", function() {
         showError(error.message);
       });
   });
+
+  const batterInput = document.getElementById("batter");
+  const batterList = document.getElementById(batterInput.getAttribute("list"));
+  batterInput.addEventListener("input", configureTypeahead("batters", batterList));
+
+  const pitcherInput = document.getElementById("pitcher");
+  const pitcherList = document.getElementById(pitcherInput.getAttribute("list"));
+  pitcherInput.addEventListener("input", configureTypeahead("pitchers", pitcherList));
 });
 
 /* Drawing/rendering logic */
@@ -61,6 +69,32 @@ function showError(message) {
 
 function hideError() {
   d3.select("#error-message").classed("hidden", true);
+}
+
+/**
+ * Adds a listener for typeahead 
+ * @param {string} playerType The type of player to search. Valid values are "batters" and "pitchers".
+ * @param {HTMLElement} listElement The parent DOM element into which the list of suggestions will be inserted.
+ */
+function configureTypeahead(playerType, listElement) {
+  return function(event) {
+    const data = event.target.value;
+    const minimumLengthForTypeahead = 3;
+    if (data && data.length === minimumLengthForTypeahead) {
+      getPlayerTypeaheadSuggestions(playerType, data).then(function(players) {
+        while (listElement.hasChildNodes()) {
+          listElement.removeChild(listElement.lastChild);
+        }
+        players.forEach(function(player) {
+          const optionNode = document.createElement("option");
+          optionNode.setAttribute("data-value", player.id);
+          optionNode.setAttribute("label", `${player.position}, ${player.team_short}`);
+          optionNode.innerText = player.name;
+          listElement.appendChild(optionNode);
+        });
+      });
+    }
+  }
 }
 
 /**
@@ -180,12 +214,19 @@ function transformCoordinates(x, y, origin, scale) {
 /* API Calls */
 
 /**
- * Send an http request to the server to generate a heatmap.
- * @returns {Promise<Heatmap>}
+ * Makes a request to the API, returning the JSON response.
+ * @param {string} endpointUrl The API endpoint that is the destination of the request.
+ * @param {any} options Request options. Same as fetch options but with params for query parameters.
  */
-function generateHeatmap(formData) {
-  return fetch("/heatmap", { method: "POST", body: formData }).then(
-    response => {
+function makeJsonRequest(endpointUrl, options) {
+  const baseUrl = 'http://localhost:5000'; // server host
+  const url = new URL(endpointUrl, baseUrl);
+  if (options.params) {
+    const urlParams = new URLSearchParams(options.params);
+    url.search = urlParams.toString();
+  }
+  return fetch(url, { method: options.method, body: options.body }).then(
+    function(response) {
       if (response.ok) {
         return response.json();
       }
@@ -194,4 +235,22 @@ function generateHeatmap(formData) {
       );
     }
   );
+}
+
+/**
+ * Generate a heatmap for the given form input.
+ * @returns {Promise<Heatmap>}
+ */
+function generateHeatmap(formData) {
+  return makeJsonRequest("/heatmap", { method: "POST", body: formData });
+}
+
+/**
+ * Get player typeahead suggestions.
+ * @param {string} playerType The type of player to search. Valid values are "batters" and "pitchers". 
+ * @param {string} namePrefix The prefix to match for suggestions.
+ */
+function getPlayerTypeaheadSuggestions(playerType, namePrefix) {
+  const params = { name_prefix: namePrefix };
+  return makeJsonRequest(`/${playerType}`, { method: "GET", params });
 }
