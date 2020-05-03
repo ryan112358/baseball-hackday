@@ -58,7 +58,6 @@ def generate_heatmap(features):
 
     :return: the heatmap json object
     """
-    name_id_map = json.load(open('../name_id_map.json','r'))
     if features['batter'] != '':
         features['stand'] = ''
     if features['pitcher'] != '':
@@ -77,8 +76,6 @@ def generate_heatmap(features):
         df[col] = df[col]
 
     features = ['pitch_type', 'batter', 'pitcher', 'stand', 'p_throws', 'balls', 'strikes', 'in_scoring_pos', 'on_base', 'home', 'plate_x', 'plate_z']
-    df['batter'] = df.batter.map(name_id_map)
-    df['pitcher'] = df.pitcher.map(name_id_map)
 
     X = df.astype(dtypes)[features]
     X1 = X[['plate_x','plate_z']].values

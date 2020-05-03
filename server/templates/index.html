@@ -13,9 +13,9 @@
       <form id="heatmap-form">
         <div class="input-container batter">
           <label class="label" for="batter">Batter</label>
-          <input type="text" id="batter" name="batter" list="batters_list" />
-          <datalist id="batters_list">
-          </datalist>
+          <input type="text" id="batter_name" list="batters_list" />
+          <input type="hidden" id="batter_id" name="batter" />
+          <datalist id="batters_list"></datalist>
         </div>
         <div class="input-container stance">
           <p class="label">Batter Stance</p>
@@ -30,9 +30,9 @@
         </div>
         <div class="input-container pitcher">
           <label class="label" for="pitcher">Pitcher</label>
-          <input type="text" id="pitcher" name="pitcher" list="pitchers_list" />
-          <datalist id="pitchers_list">
-          </datalist>
+          <input type="text" id="pitcher_name" list="pitchers_list" />
+          <input type="hidden" id="pitcher_id" name="pitcher" />
+          <datalist id="pitchers_list"></datalist>
         </div>
         <div class="input-container throws">
           <p class="label">Pitcher Throws</p>
@@ -48,7 +48,7 @@
         <div class="input-container pitch-type">
           <label class="label" for="pitch_type">Pitch Type</label>
           <select id="pitch_type" name="pitch_type">
-            <option value="null" selected>All pitch types</option>
+            <option value="null" selected>All</option>
             {% for pitch_type in domain.pitch_type %}
             <option>{{ pitch_type }}</option>
             {% endfor %}
@@ -94,7 +94,9 @@
         <button class="submit-button" type="submit">
           Generate Heatmap
         </button>
-        <p id="error-message" class="hidden"></p>
+        <div class="input-container error">
+          <p id="error-message" class="hidden"></p>
+        </div>
       </form>
     </div>
     <div class="viz-container">
@@ -108,5 +110,4 @@
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script src="{{ url_for('static', filename='heatmap.js') }}"></script>
 </body>
-
 </html>

@@ -3,6 +3,11 @@ window.addEventListener("load", function() {
   const heatmapForm = document.getElementById("heatmap-form");
 
   heatmapForm.addEventListener("submit", function(event) {
+    // Prevent submission if there are errors
+    const errorNode = d3.select("#error-message");
+    if (!errorNode.classed("hidden")) {
+      return;
+    }
     // Prevent full page form submission and just send the api call
     event.preventDefault();
     hideError();
@@ -42,13 +47,14 @@ window.addEventListener("load", function() {
       });
   });
 
-  const batterInput = document.getElementById("batter");
-  const batterList = document.getElementById(batterInput.getAttribute("list"));
-  batterInput.addEventListener("input", configureTypeahead("batters", batterList));
-
-  const pitcherInput = document.getElementById("pitcher");
-  const pitcherList = document.getElementById(pitcherInput.getAttribute("list"));
-  pitcherInput.addEventListener("input", configureTypeahead("pitchers", pitcherList));
+  const batterNameInput = document.getElementById("batter_name");
+  const batterIdInput = document.getElementById("batter_id");
+  configureTypeahead("batters", batterNameInput);
+  capturePlayerId(batterNameInput, batterIdInput);
+  const pitcherNameInput = document.getElementById("pitcher_name");
+  const pitcherIdInput = document.getElementById("pitcher_id");
+  configureTypeahead("pitchers", pitcherNameInput);
+  capturePlayerId(pitcherNameInput, pitcherIdInput);
 });
 
 /* Drawing/rendering logic */
@@ -64,7 +70,7 @@ function showError(message) {
     errorNode.classed("hidden", false);
   }
 
-  errorNode.innerHTML = message;
+  errorNode.text(message);
 }
 
 function hideError() {
@@ -74,10 +80,11 @@ function hideError() {
 /**
  * Adds a listener for typeahead 
  * @param {string} playerType The type of player to search. Valid values are "batters" and "pitchers".
- * @param {HTMLElement} listElement The parent DOM element into which the list of suggestions will be inserted.
+ * @param {HTMLInputElement} inputElement A text input.
  */
-function configureTypeahead(playerType, listElement) {
-  return function(event) {
+function configureTypeahead(playerType, inputElement) {
+  const listElement = document.getElementById(inputElement.getAttribute("list"));
+  inputElement.addEventListener("input", function(event) {
     const data = event.target.value;
     const minimumLengthForTypeahead = 3;
     if (data && data.length === minimumLengthForTypeahead) {
@@ -94,7 +101,29 @@ function configureTypeahead(playerType, listElement) {
         });
       });
     }
-  }
+  });
+}
+
+/**
+ * Take the player id from the selected player name option and save it into the form.
+ * @param {HTMLInputElement} playerNameInputElement The player name input element.
+ * @param {HTMLInputElement} playerIdInputElement The player id input element.
+ */
+function capturePlayerId(playerNameInputElement, playerIdInputElement) {
+  playerNameInputElement.addEventListener("blur", function () {
+    const listElement = document.getElementById(playerNameInputElement.getAttribute("list"));
+  
+    for (const playerOption of listElement.children) {
+      if (playerOption.innerText === playerNameInputElement.value) {
+        playerIdInputElement.value = playerOption.getAttribute("data-value");
+        break;
+      }
+    }
+
+    if (!playerIdInputElement.value) {
+      showError("We can't find this player. Please select a player from the list.")
+    }
+  });
 }
 
 /**
