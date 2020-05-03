@@ -3,11 +3,6 @@ window.addEventListener("load", function() {
   const heatmapForm = document.getElementById("heatmap-form");
 
   heatmapForm.addEventListener("submit", function(event) {
-    // Prevent submission if there are errors
-    const errorNode = d3.select("#error-message");
-    if (!errorNode.classed("hidden")) {
-      return;
-    }
     // Prevent full page form submission and just send the api call
     event.preventDefault();
     hideError();
@@ -47,14 +42,12 @@ window.addEventListener("load", function() {
       });
   });
 
-  const batterNameInput = document.getElementById("batter_name");
-  const batterIdInput = document.getElementById("batter_id");
-  configureTypeahead("batters", batterNameInput);
-  capturePlayerId(batterNameInput, batterIdInput);
-  const pitcherNameInput = document.getElementById("pitcher_name");
-  const pitcherIdInput = document.getElementById("pitcher_id");
-  configureTypeahead("pitchers", pitcherNameInput);
-  capturePlayerId(pitcherNameInput, pitcherIdInput);
+  const batterInput = document.getElementById("batter");
+  configureTypeahead("batters", batterInput);
+  showPlayerHandednessIfNeeded(batterInput, "stance");
+  const pitcherInput = document.getElementById("pitcher");
+  configureTypeahead("pitchers", pitcherInput);
+  showPlayerHandednessIfNeeded(pitcherInput, "throws");
 });
 
 /* Drawing/rendering logic */
@@ -104,24 +97,24 @@ function configureTypeahead(playerType, inputElement) {
   });
 }
 
-/**
- * Take the player id from the selected player name option and save it into the form.
- * @param {HTMLInputElement} playerNameInputElement The player name input element.
- * @param {HTMLInputElement} playerIdInputElement The player id input element.
- */
-function capturePlayerId(playerNameInputElement, playerIdInputElement) {
-  playerNameInputElement.addEventListener("blur", function () {
-    const listElement = document.getElementById(playerNameInputElement.getAttribute("list"));
-  
-    for (const playerOption of listElement.children) {
-      if (playerOption.innerText === playerNameInputElement.value) {
-        playerIdInputElement.value = playerOption.getAttribute("data-value");
-        break;
+function showPlayerHandednessIfNeeded(playerNameInputElement, handednessQualityName) {
+  playerNameInputElement.addEventListener("blur", function (event) {
+    const container = d3.select(`.input-container.${handednessQualityName}`);
+    if (!event.target.value) {
+      if (container.classed("hidden")) {
+        container.classed("hidden", false);
       }
-    }
-
-    if (!playerIdInputElement.value) {
-      showError("We can't find this player. Please select a player from the list.")
+      // Enable previously disabled inputs and give the first one focus
+      container.selectAll("input")
+        .property("disabled", false)
+        .node()
+        .focus();
+    } else {
+      container.classed("hidden", true);
+      // Disabled inputs
+      container.selectAll("input")
+        .property("disabled", true);
+      // TODO: force the browser focus to the next element in the form
     }
   });
 }
