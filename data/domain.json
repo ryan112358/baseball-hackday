@@ -1,0 +1,52 @@
+{
+    "pitch_type": [
+        "CH",
+        "CU",
+        "EP",
+        "FA",
+        "FC",
+        "FF",
+        "FO",
+        "FS",
+        "FT",
+        "IN",
+        "KC",
+        "KN",
+        "PO",
+        "SC",
+        "SI",
+        "SL",
+        "UN"
+    ],
+    "stand": [
+        "L",
+        "R"
+    ],
+    "p_throws": [
+        "L",
+        "R"
+    ],
+    "balls": [
+        "0",
+        "1",
+        "2",
+        "3"
+    ],
+    "strikes": [
+        "0",
+        "1",
+        "2"
+    ],
+    "in_scoring_pos": [
+        "False",
+        "True"
+    ],
+    "on_base": [
+        "False",
+        "True"
+    ],
+    "home": [
+        "False",
+        "True"
+    ]
+}
