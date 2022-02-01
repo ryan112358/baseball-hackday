@@ -59,6 +59,8 @@ def generate_heatmap(features):
     X = df.astype(dtypes)[features]
     X1 = X[['plate_x','plate_z']].values
     X2 = pd.get_dummies(X.drop(columns=['plate_x','plate_z']), dummy_na=True, sparse=True)
+    X1 = sparse.csr_matrix(X1)
+    X2 = sparse.csr_matrix(X2.values)
     XX = sparse.hstack([X1, X2], format='csr')
     #print(XX.shape)
 
