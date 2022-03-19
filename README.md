@@ -6,18 +6,18 @@
 
 Because the web server relies on many third party packages, using a [virtual environment](https://docs.python.org/3/tutorial/venv.html) can help ensure that compatible versions of those packages are installed and do not conflict with other versions of packages that may be installed on the same machine. This is not required, but may help avoid bugs caused by a tangled dependecy tree.
 
-A virtual environment can be created with the command `python3 -m venv <name>` where `<name>` is the name you give to your virtual environment. This creates a directory called `<name>` (be sure to add it to `.gitignore`). Before it can be used, the virtual environment must be activated using the following command:
+A virtual environment (venv) can be created with the command `python3 -m venv venv`. This creates a directory called `venv` (which is in `.gitignore`). Before it can be used, the virtual environment must be activated using the following command:
 
 Windows
 
 ```
-name\Scripts\activate.bat
+venv\Scripts\activate.bat
 ```
 
 Mac/Unix
 
 ```
-. name/bin/activate
+. venv/bin/activate
 ```
 
 Once activated, the environment can be deactivated with the shell command `deactivate`.
