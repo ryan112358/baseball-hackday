@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    with open('../domain.json', 'r') as domain_file:
+    with open('./domain.json', 'r') as domain_file:
         domain = json.load(domain_file)
         return render_template('index.html', domain = domain)
 
@@ -34,15 +34,15 @@ def generate_heatmap(features):
 
     :return: the heatmap json object
     """
-    name_id_map = json.load(open('../name_id_map.json','r'))
+    name_id_map = json.load(open('./name_id_map.json','r'))
     if features['batter'] != '':
         features['stand'] = ''
     if features['pitcher'] != '':
         features['p_throws'] = ''
 
     #model = pickle.load(open('../lgbm.pkl','rb'))
-    model = pickle.load(open('../nnet.pkl','rb'))
-    dtypes = pickle.load(open('../dtypes.pkl','rb'))
+    model = pickle.load(open('./nnet.pkl','rb'))
+    dtypes = pickle.load(open('./dtypes.pkl','rb'))
     x = pd.DataFrame(np.linspace(-2, 2), columns=['plate_x'])
     y = pd.DataFrame(np.linspace(0, 5), columns=['plate_z'])
     x['key'] = 0
@@ -75,7 +75,4 @@ def generate_heatmap(features):
     return ans
 
 if __name__ == '__main__':
-    features = ['pitch_type', 'batter', 'pitcher', 'stand', 'p_throws', 'balls', 'strikes', 'in_scoring_pos', 'on_base', 'home']
-    entry = { f : '' for f in features }
-    entry['batter'] = '605141'
-    #ans = generate_heatmap(entry)
+    app.run()
