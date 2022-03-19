@@ -2,7 +2,7 @@ import json
 
 def getPlayers(type = None):
     players = {}
-    with open('../data/players.json', 'r') as players_file:
+    with open('./data/players.json', 'r') as players_file:
         players = json.load(players_file)
         
     if type is not None:

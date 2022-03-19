@@ -6,7 +6,7 @@ import numpy as np
 from scipy import sparse
 import json
 
-from .services.player_service import getBatters, getPitchers
+from services.player_service import getBatters, getPitchers
 
 app = Flask(__name__)
 
@@ -20,7 +20,7 @@ cache_buster.init_app(app)
 @app.route('/')
 def index():
     domain = {}
-    with open('../data/domain.json', 'r') as domain_file:
+    with open('./data/domain.json', 'r') as domain_file:
         domain = json.load(domain_file)
     
     return render_template('index.html', domain = domain)
