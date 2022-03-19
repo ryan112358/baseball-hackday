@@ -1,30 +1,52 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
+from flask_cachebuster import CacheBuster
 import pickle
 import pandas as pd
 import numpy as np
 from scipy import sparse
 import json
 
+from .services.player_service import getBatters, getPitchers
+
 app = Flask(__name__)
+
+# Generate a unique hash for static files based on their content. This hash
+# will be sent as a query parameter on requests for the file, ensuring that
+# the browser always gets the most up to date version
+cache_bust_config = { 'extensions': ['.js', '.css'], 'hash_size': 5 }
+cache_buster = CacheBuster(config=cache_bust_config)
+cache_buster.init_app(app)
 
 @app.route('/')
 def index():
-    with open('./domain.json', 'r') as domain_file:
+    domain = {}
+    with open('../data/domain.json', 'r') as domain_file:
         domain = json.load(domain_file)
-        return render_template('index.html', domain = domain)
+    
+    return render_template('index.html', domain = domain)
 
-@app.route('/heatmap', methods=["POST"])
+@app.route('/heatmap', methods=['POST'])
 def heatmap():
     features = { }
     for f in ['pitch_type','batter','pitcher','stand','p_throws','balls','strikes','in_scoring_pos','on_base','home']:
         try:
             features[f] = request.form[f]
         except:
-            features[f] = '' 
-
-    print(features)
+            features[f] = ''
 
     return generate_heatmap(features)
+
+@app.route('/batters', methods=['GET'])
+def batters():
+    name_prefix = request.args.get('name_prefix')
+    batters = getBatters(name_prefix)
+    return jsonify(batters)
+
+@app.route('/pitchers', methods=['GET'])
+def pitchers():
+    name_prefix = request.args.get('name_prefix')
+    pitchers = getPitchers(name_prefix)
+    return jsonify(pitchers)
 
 def generate_heatmap(features):
     """
