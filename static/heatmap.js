@@ -241,7 +241,7 @@ function transformCoordinates(x, y, origin, scale) {
  * @param {any} options Request options. Same as fetch options but with params for query parameters.
  */
 function makeJsonRequest(endpointUrl, options) {
-  const baseUrl = 'http://localhost:5000'; // server host
+  const baseUrl = window.location.href; // server host
   const url = new URL(endpointUrl, baseUrl);
   if (options.params) {
     const urlParams = new URLSearchParams(options.params);
