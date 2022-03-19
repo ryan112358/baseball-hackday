@@ -42,6 +42,11 @@ p {
   margin-bottom: 8px;
 }
 
+.input-container.error {
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
 .label {
   text-transform: uppercase;
   font-size: 18px;
@@ -124,5 +129,5 @@ p {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
