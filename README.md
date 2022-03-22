@@ -30,4 +30,10 @@ If you're setting up the repository for the first time, install the packages lis
 
 ## Rendering the visualization
 
-The model is exposed through a simple webpage that allows the input of parameters to generate a heatmap. This webpage is served from a server implemented using the [Flask framework for Python](https://flask.palletsprojects.com/en/1.1.x/). To start the server, run the bash script at `bin/run-server.sh` and navigate to http://localhost:5000 to view the webpage.
+The model is exposed through a simple webpage that allows the input of parameters to generate a heatmap. This webpage is served from a server implemented using the [Flask framework for Python](https://flask.palletsprojects.com/en/1.1.x/). To start the server, run `python app.py` and navigate to http://localhost:5000 to view the webpage.
+
+## Deployment
+
+The app can be deployed to Azure using VS Code's Azure Extension as documented [here](https://docs.microsoft.com/en-us/azure/app-service/quickstart-python?tabs=flask%2Cwindows%2Cazure-portal%2Cterminal-bash%2Cvscode-deploy%2Cdeploy-instructions-azportal%2Cdeploy-instructions-zip-azcli#3---deploy-your-application-code-to-azure).
+
+The script `bin/deploy.sh` can also be used to deploy the app manually. To use the script, first you must [install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
