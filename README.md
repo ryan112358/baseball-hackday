@@ -6,18 +6,18 @@
 
 Because the web server relies on many third party packages, using a [virtual environment](https://docs.python.org/3/tutorial/venv.html) can help ensure that compatible versions of those packages are installed and do not conflict with other versions of packages that may be installed on the same machine. This is not required, but may help avoid bugs caused by a tangled dependecy tree.
 
-A virtual environment can be created with the command `python3 -m venv <name>` where `<name>` is the name you give to your virtual environment. This creates a directory called `<name>` (be sure to add it to `.gitignore`). Before it can be used, the virtual environment must be activated using the following command:
+A virtual environment (venv) can be created with the command `python3 -m venv venv`. This creates a directory called `venv` (which is in `.gitignore`). Before it can be used, the virtual environment must be activated using the following command:
 
 Windows
 
 ```
-name\Scripts\activate.bat
+venv\Scripts\activate.bat
 ```
 
 Mac/Unix
 
 ```
-. name/bin/activate
+. venv/bin/activate
 ```
 
 Once activated, the environment can be deactivated with the shell command `deactivate`.
@@ -30,4 +30,10 @@ If you're setting up the repository for the first time, install the packages lis
 
 ## Rendering the visualization
 
-The model is exposed through a simple webpage that allows the input of parameters to generate a heatmap. This webpage is served from a server implemented using the [Flask framework for Python](https://flask.palletsprojects.com/en/1.1.x/). To start the server, run the bash script at `bin/run-server.sh` and navigate to http://localhost:5000 to view the webpage.
+The model is exposed through a simple webpage that allows the input of parameters to generate a heatmap. This webpage is served from a server implemented using the [Flask framework for Python](https://flask.palletsprojects.com/en/1.1.x/). To start the server, run `python app.py` and navigate to http://localhost:5000 to view the webpage.
+
+## Deployment
+
+The app can be deployed to Azure using VS Code's Azure Extension as documented [here](https://docs.microsoft.com/en-us/azure/app-service/quickstart-python?tabs=flask%2Cwindows%2Cazure-portal%2Cterminal-bash%2Cvscode-deploy%2Cdeploy-instructions-azportal%2Cdeploy-instructions-zip-azcli#3---deploy-your-application-code-to-azure).
+
+The script `bin/deploy.sh` can also be used to deploy the app manually. To use the script, first you must [install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
