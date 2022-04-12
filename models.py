@@ -4,6 +4,7 @@ from sklearn.neural_network import MLPClassifier
 import pandas as pd
 import numpy as np
 from scipy import sparse
+from collections import defaultdict
 
 def train(data, features):
     X = data[features]
@@ -14,7 +15,13 @@ def train(data, features):
             Y.loc[idx, col] = np.nan   
     X = pd.concat([X,Y]).reset_index(drop=True)
 
-    y = data['events'].isin(['single','double','triple','home_run'])
+    #y = data['events'].isin(['single','double','triple','home_run'])
+    mapping = defaultdict(lambda: 0)
+    mapping['single'] = 1
+    mapping['double'] = 2
+    mapping['triple'] = 3
+    mapping['home_run'] = 4
+    y = data['events'].map(mapping)
     y = pd.concat([y,y]).reset_index(drop=True)
 
     #model = LGBMClassifier()
@@ -22,6 +29,9 @@ def train(data, features):
 
     X1 = X[['plate_x','plate_z']].values
     X2 = pd.get_dummies(X.drop(columns=['plate_x','plate_z']), dummy_na=True, sparse=True)
+    X1 = sparse.csr_matrix(X1)
+    X2 = sparse.csr_matrix(X2.values)
+    #from IPython import embed; embed()
     XX = sparse.hstack([X1, X2], format='csr')
     print(XX.shape)
 
@@ -31,7 +41,8 @@ def train(data, features):
     return model
 
 def clean(data):
-    data = data[data.events.notnull()].dropna(subset=['plate_x','plate_z'])
+#    data = data[data.events.notnull()].dropna(subset=['plate_x','plate_z'])
+    data = data[data.description == 'hit_into_play'].dropna(subset=['plate_x','plate_z'])
     
     data['batter'] = data.batter.astype(str)
     data['pitcher'] = data.pitcher.astype(str)
@@ -61,6 +72,7 @@ if __name__ == '__main__':
     data = pickle.load(open('data.pkl','rb'))
     data = clean(data)
     features = ['pitch_type', 'batter', 'pitcher', 'stand', 'p_throws', 'balls', 'strikes', 'in_scoring_pos', 'on_base', 'home', 'plate_x', 'plate_z']
+    #from IPython import embed; embed()
     model = train(data, features) 
     pickle.dump(data[features].dtypes, open('dtypes.pkl','wb'))
     pickle.dump(model, open('nnet.pkl','wb'))

@@ -57,14 +57,15 @@ def generate_heatmap(features):
     :return: the heatmap json object
     """
     name_id_map = json.load(open('./name_id_map.json','r'))
+    strikezones = json.load(open('./data/strikezone.json','r'))
     if features['batter'] != '':
         features['stand'] = ''
     if features['pitcher'] != '':
         features['p_throws'] = ''
 
     #model = pickle.load(open('../lgbm.pkl','rb'))
-    model = pickle.load(open('./nnet.pkl','rb'))
-    dtypes = pickle.load(open('./dtypes.pkl','rb'))
+    model = pickle.load(open('./data/nnet.pkl','rb'))
+    dtypes = pickle.load(open('./data/dtypes.pkl','rb'))
     x = pd.DataFrame(np.linspace(-2, 2), columns=['plate_x'])
     y = pd.DataFrame(np.linspace(0, 5), columns=['plate_z'])
     x['key'] = 0
@@ -74,9 +75,10 @@ def generate_heatmap(features):
         df[col] = features[col]
         df[col] = df[col]
 
+    b = features['batter']
     features = ['pitch_type', 'batter', 'pitcher', 'stand', 'p_throws', 'balls', 'strikes', 'in_scoring_pos', 'on_base', 'home', 'plate_x', 'plate_z']
-    df['batter'] = df.batter.map(name_id_map)
-    df['pitcher'] = df.pitcher.map(name_id_map)
+    #df['batter'] = df.batter.map(name_id_map)
+    #df['pitcher'] = df.pitcher.map(name_id_map)
 
     X = df.astype(dtypes)[features]
     X1 = X[['plate_x','plate_z']].values
@@ -87,10 +89,12 @@ def generate_heatmap(features):
     #print(XX.shape)
 
     #p = model.predict_proba(df)[:,1]
-    p = model.predict_proba(XX)[:,1]
+    v = np.array([0,1,2,3,4])
+    p = model.predict_proba(XX) @ v
 
+    z = strikezones[b] if b in strikezones else [1.5, 3.5]
     ans = {}
-    ans['zone'] = [-0.75, 1.5, 0.75, 3.5]
+    ans['zone'] = [-0.75, z[0], 0.75, z[1]]
     ans['x'] = list(df.plate_x)
     ans['y'] = list(df.plate_z)
     ans['heat'] = list(p)
